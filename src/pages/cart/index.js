@@ -1,32 +1,47 @@
 import { CartContext } from "@/utils/ContextReducer";
+import { useRouter } from "next/router";
 
 import React, { useContext, useState } from "react";
 
 function Cart() {
   const { state, dispatch } = useContext(CartContext);
+  const [errorMessage, setErrorMessage] = useState(
+    "Your order was canceled 😔"
+  );
+  const router = useRouter();
   const [success, setSuccess] = useState(false);
   const [fail, setFail] = useState(false);
   const handleCheckOut = async () => {
     let userEmail = localStorage.getItem("userEmail");
-
-    await fetch("api/ordersData", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        order_data: state,
-        email: userEmail,
-        order_date: new Date().toDateString(),
-      }),
-    })
-      .then((response) => {
+    console.log(localStorage.getItem("userEmail"));
+    if (
+      localStorage.getItem("userEmail") === null ||
+      localStorage.getItem("userEmail") === undefined
+    ) {
+      router.push("/login");
+    } else {
+      await fetch("api/ordersData", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          order_data: state,
+          email: userEmail,
+          order_date: new Date().toDateString(),
+        }),
+      }).then((response) => {
         if (response.status === 200) {
           dispatch({ type: "DROP" });
           setSuccess(true);
+        } else if (response.status === 400) {
+          setErrorMessage(
+            "If not logged in then, Please log in and try again."
+          );
+          setFail(true);
         }
-      })
-      .catch((response) => response.status !== 200 && setFail(true));
+      });
+    }
   };
   let totalPrice = state.reduce((total, food) => total + food.price, 0);
   return (
@@ -87,7 +102,7 @@ function Cart() {
           <div className="flex">
             <div class="py-1">
               <svg
-                class="fill-current h-6 w-6 text-teal-500 mr-4"
+                class="fill-current h-6 w-6 text-red-500 mr-4"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
               >
@@ -97,7 +112,7 @@ function Cart() {
             <div className="flex flex-row justify-between">
               <div>
                 <p class="font-bold">Holy smokes !!</p>
-                <p class="text-sm">Your order was cancelled 😔</p>
+                <p class="text-sm">{errorMessage}</p>
               </div>
               <button
                 type="button"
