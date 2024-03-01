@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+.border-gradient {
+  position: relative;
+}
+.border-gradient ::before {
+  position: absolute;
+  content: "";
+  inset: 0;
+  border-radius: 8px;
+  pointer-events: none;
+  padding: 2px;
+  background: linear-gradient(45deg, #c2410c, #6d28d9, #4338ca);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.box {
+  /* Required properties */
+  position: relative;
+  /* Use  your own styles here */
+  margin: 25px;
+  width: fit-content;
+  height: fit-content;
+}
+.box:before {
+  content: "";
+  z-index: -1;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(-45deg, #c2410c, #6d28d9, #4338ca);
+  transform: translate3d(0px, 30px, 10px) scale(0.75);
+  filter: blur(50px);
+  opacity: var(0.5);
+  transition: opacity 0.3s ease-in-out;
+  border-radius: inherit;
+}
+.box:hover::before {
+  transform: translate3d(0px, 30px, 0) scale(0.9);
+  transition: opacity 0.3s ease-in-out;
+}
+/* 
+* Prevents issues when the parent creates a 
+* stacking context. (For example, using the transform
+* property )
+*/
+.box::after {
+  content: "";
+  z-index: -1;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: inherit;
+  border-radius: inherit;
+}
+
+.short_description {
+  /* height:50px; */
+  overflow: hidden;
+  min-height: 50px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2; /* start showing ellipsis when 3rd line is reached */
+  white-space: pre-wrap; /* let the text wrap preserving spaces */
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
